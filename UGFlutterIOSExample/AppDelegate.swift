@@ -7,40 +7,149 @@
 //
 
 import UIKit
+import UserNotifications
+import Flutter
+import FlutterPluginRegistrant
+import UGFlutter
 
 @UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-
+class AppDelegate: UIResponder, UIApplicationDelegate, FlutterAppLifeCycleProvider, FlutterPluginRegistry, UNUserNotificationCenterDelegate {
     var window: UIWindow?
-
-
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
-        return true
+    var flutterAppLifeCycleDelegate: FlutterPluginAppLifeCycleDelegate!
+    
+    //MARK: Methods added for Flutter integration
+    override init() {
+        self.flutterAppLifeCycleDelegate = FlutterPluginAppLifeCycleDelegate()
     }
-
-    func applicationWillResignActive(_ application: UIApplication) {
-        // Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
-        // Use this method to pause ongoing tasks, disable timers, and invalidate graphics rendering callbacks. Games should use this method to pause the game.
+    
+    func rootFlutterViewController() -> FlutterViewController? {
+        guard let viewController: UIViewController = UIApplication.shared.keyWindow?.rootViewController else {
+            return nil
+        }
+        guard viewController.isKind(of: FlutterViewController.self), let flutterRootViewController = viewController as? FlutterViewController else {
+            return nil
+        }
+        return flutterRootViewController
     }
-
+    
+    //MARK: Normal delegate methods
+    
+    func application(_ application: UIApplication, willFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey : Any]? = nil) -> Bool {
+        UGFlutter.configure()
+        return self.flutterAppLifeCycleDelegate.application(application, willFinishLaunchingWithOptions: launchOptions ?? [:])
+    }
+    
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        if self.rootFlutterViewController() != nil {
+            self.rootFlutterViewController()?.handleStatusBarTouches(event)
+        }
+    }
+    
     func applicationDidEnterBackground(_ application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        self.flutterAppLifeCycleDelegate.applicationDidEnterBackground(application)
     }
-
+    
     func applicationWillEnterForeground(_ application: UIApplication) {
-        // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        self.flutterAppLifeCycleDelegate.applicationWillEnterForeground(application)
     }
-
+    
+    func applicationWillResignActive(_ application: UIApplication) {
+        self.flutterAppLifeCycleDelegate.applicationWillResignActive(application)
+    }
+    
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        self.flutterAppLifeCycleDelegate.applicationDidBecomeActive(application)
     }
-
+    
     func applicationWillTerminate(_ application: UIApplication) {
-        // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
+        self.flutterAppLifeCycleDelegate.applicationWillTerminate(application)
     }
-
-
+    
+    func application(_ application: UIApplication, didRegister notificationSettings: UIUserNotificationSettings) {
+        self.flutterAppLifeCycleDelegate.application(application, didRegister: notificationSettings)
+    }
+    
+    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
+        self.flutterAppLifeCycleDelegate.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+    }
+    
+    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        self.flutterAppLifeCycleDelegate.application(application, didReceiveRemoteNotification: userInfo, fetchCompletionHandler: completionHandler)
+    }
+    
+    func application(_ application: UIApplication, didReceive notification: UILocalNotification) {
+        self.flutterAppLifeCycleDelegate.application(application, didReceive: notification)
+    }
+    
+    @available(iOS 10.0, *)
+    func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
+        self.flutterAppLifeCycleDelegate.userNotificationCenter(center, willPresent: notification, withCompletionHandler: completionHandler)
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplicationOpenURLOptionsKey : Any] = [:]) -> Bool {
+        return self.flutterAppLifeCycleDelegate.application(app, open: url, options: options)
+    }
+    
+    func application(_ application: UIApplication, handleOpen url: URL) -> Bool {
+        return self.flutterAppLifeCycleDelegate.application(application, handleOpen: url)
+    }
+    
+    func application(_ application: UIApplication, open url: URL, sourceApplication: String?, annotation: Any) -> Bool {
+        return self.flutterAppLifeCycleDelegate.application(application, open: url, sourceApplication: sourceApplication!, annotation: annotation)
+    }
+    
+    func application(_ application: UIApplication, performActionFor shortcutItem: UIApplicationShortcutItem, completionHandler: @escaping (Bool) -> Void) {
+        return self.flutterAppLifeCycleDelegate.application(application, performActionFor: shortcutItem, completionHandler: completionHandler)
+    }
+    
+    func application(_ application: UIApplication, handleEventsForBackgroundURLSession identifier: String, completionHandler: @escaping () -> Void) {
+        self.flutterAppLifeCycleDelegate.application(application, handleEventsForBackgroundURLSession: identifier, completionHandler: completionHandler)
+    }
+    
+    func application(_ application: UIApplication, performFetchWithCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
+        self.flutterAppLifeCycleDelegate.application(application, performFetchWithCompletionHandler: completionHandler)
+    }
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([Any]?) -> Void) -> Bool {
+        return self.flutterAppLifeCycleDelegate.application(application, continue: userActivity, restorationHandler: restorationHandler)
+    }
+    
+    func addApplicationLifeCycleDelegate(_ delegate: FlutterPlugin) {
+        self.flutterAppLifeCycleDelegate.add(delegate)
+    }
+    
+    
+    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        // Override point for customization after application launch.
+        GeneratedPluginRegistrant.register(with: self)
+        return self.flutterAppLifeCycleDelegate.application(application, didFinishLaunchingWithOptions: launchOptions ?? [:])
+    }
+    
+    //MARK: FlutterPluginRegistry. All delegating to root view controller
+    
+    //This warning cannot be solved as of now as the protocol is written with non optional but implementation requires optional
+    func registrar(forPlugin pluginKey: String) -> FlutterPluginRegistrar! {
+        guard let rootViewController = self.window?.rootViewController, let flutterRootViewController = rootViewController as? FlutterViewController else {
+            return nil
+        }
+        return flutterRootViewController.pluginRegistry()!.registrar(forPlugin: pluginKey)
+    }
+    
+    func hasPlugin(_ pluginKey: String) -> Bool {
+        guard let rootViewController = self.window?.rootViewController, let flutterRootViewController = rootViewController as? FlutterViewController else {
+            return false
+        }
+        return flutterRootViewController.pluginRegistry()!.hasPlugin(pluginKey)
+    }
+    
+    //This warning cannot be solved as of now as the protocol is written with non optional but implementation requires optional
+    func valuePublished(byPlugin pluginKey: String) -> NSObject! {
+        guard let rootViewController = self.window?.rootViewController, let flutterRootViewController = rootViewController as? FlutterViewController else {
+            return nil
+        }
+        return flutterRootViewController.pluginRegistry()!.valuePublished(byPlugin: pluginKey)
+    }
 }
+
 

@@ -1,0 +1,36 @@
+PODS:
+  - Flutter (1.0.0)
+  - FlutterPluginRegistrant (0.0.1):
+    - Flutter
+    - path_provider
+  - path_provider (0.0.1):
+    - Flutter
+  - UGFlutter (0.1.0):
+    - Flutter (= 1.0.0)
+    - FlutterPluginRegistrant (= 0.0.1)
+
+DEPENDENCIES:
+  - Flutter (from `../UGFlutter/flutter/.ios/Flutter/engine/`)
+  - FlutterPluginRegistrant (from `../UGFlutter/flutter/.ios/Flutter/FlutterPluginRegistrant/`)
+  - path_provider (from `../UGFlutter/flutter/.ios/Flutter/.symlinks/path_provider/ios`)
+  - UGFlutter (from `../UGFlutter/`)
+
+EXTERNAL SOURCES:
+  Flutter:
+    :path: "../UGFlutter/flutter/.ios/Flutter/engine/"
+  FlutterPluginRegistrant:
+    :path: "../UGFlutter/flutter/.ios/Flutter/FlutterPluginRegistrant/"
+  path_provider:
+    :path: "../UGFlutter/flutter/.ios/Flutter/.symlinks/path_provider/ios"
+  UGFlutter:
+    :path: "../UGFlutter/"
+
+SPEC CHECKSUMS:
+  Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
+  FlutterPluginRegistrant: 898957c6857fd376dd0cc252802746e388cb576f
+  path_provider: 09407919825bfe3c2deae39453b7a5b44f467873
+  UGFlutter: bdad42a439b501991d862dfa84b3a99487d18613
+
+PODFILE CHECKSUM: 95ea0eb401f43827df94ed1d02ba57bf6d0b059c
+
+COCOAPODS: 1.5.3
