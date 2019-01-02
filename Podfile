@@ -2,7 +2,7 @@
 platform :ios, '9.0'
 xcodeproj 'UGFlutterIOSExample', 'StagingDebug' => :debug, 'StagingRelease' => :release
 
-flutter_application_path = "../UGFlutter/flutter"
+flutter_application_path = "../flutter"
 
 plugin 'cocoapods-integrate-flutter' , {
   :flutter_application_path => "#{flutter_application_path}"
@@ -11,7 +11,7 @@ plugin 'cocoapods-integrate-flutter' , {
 target 'UGFlutterIOSExample' do
   # Comment the next line if you're not using Swift and don't want to use dynamic frameworks
   use_frameworks!
-  pod 'UGFlutter', :path => '../UGFlutter/'
+  pod 'UGFlutter', :path => '../'
   pod 'Flutter', :path => "#{flutter_application_path}/.ios/Flutter/engine/"
   pod 'FlutterPluginRegistrant', :path => "#{flutter_application_path}/.ios/Flutter/FlutterPluginRegistrant/"
   pod 'path_provider', :path => "#{flutter_application_path}/.ios/Flutter/.symlinks/path_provider/ios"
